@@ -278,7 +278,7 @@ def check_url(url):
     else:
         return False
 
-def mainbackup():
+if __name__ == "__main__":
     # Parse command line
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--domain",
@@ -387,106 +387,6 @@ def mainbackup():
                 )
 
                 html += string + string2
-
-    if args.output != 'cli':
-        html_save(html)
-
-if __name__ == "__main__":
-
-    # Parse command line
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--domain",
-                        help="Input a domain to recursively parse all javascript located in a page",
-                        action="store_true")
-    parser.add_argument("-i", "--input",
-                        help="Input a: URL, file or folder. \
-                                For folders a wildcard can be used (e.g. '/*.js').",
-                        required="True", action="store")
-    parser.add_argument("-p", "--prefix",
-                        help="url prefix",
-                        action="store")
-    parser.add_argument("-o", "--output",
-                        help="Where to save the file, \
-                                including file name. Default: output.html",
-                        action="store", default="output.html")
-    parser.add_argument("-r", "--regex",
-                        help="RegEx for filtering purposes \
-                                against found endpoint (e.g. ^/api/)",
-                        action="store")
-    parser.add_argument("-b", "--burp",
-                        help="",
-                        action="store_true")
-    parser.add_argument("-c", "--cookies",
-                        help="Add cookies for authenticated JS files",
-                        action="store", default="")
-    args = parser.parse_args()
-
-    if args.input[-1:] == "/":
-        args.input = args.input[:-1]
-
-    mode = 1
-    if args.output == "cli":
-        mode = 0
-
-    # Convert input to URLs or JS files
-    urls = parser_input(args.input)
-
-    # Convert URLs to JS
-    urllist = []
-    html = ''
-    for url in urls:
-        if not args.burp:
-            try:
-                file = send_request(url)
-            except Exception as e:
-                parser_error("invalid input defined or SSL error: %s" % e)
-        else:
-            file = url['js']
-            url = url['url']
-
-        endpoints = parser_file(file, regex_str, mode, args.regex)
-        if args.domain:
-            for endpoint in endpoints:
-                endpoint = cgi.escape(endpoint["link"]).encode('ascii', 'ignore').decode('utf8')
-                endpoint = check_url(endpoint)
-                if endpoint is False:
-                    continue
-                print("Running against: " + endpoint)
-                print("")
-                try:
-                    file = send_request(endpoint)
-                    new_endpoints = parser_file(file, regex_str, mode, args.regex)
-                    if args.output == 'cli':
-                        cli_output(new_endpoints)
-                    else:
-                        for endpoint2 in new_endpoints:
-                            url = cgi.escape(endpoint2["link"])
-                            urllist.append(url)
-                except Exception as e:
-                    print("Invalid input defined or SSL error for: " + endpoint)
-                    continue
-
-        if args.output == 'cli':
-            cli_output(endpoints)
-        else:
-            for endpoint in endpoints:
-                url = cgi.escape(endpoint["link"])
-                urllist.append(url)
-
-    html = ""
-    urllist = list(set(urllist))
-    urllist.sort()
-    for url in urllist:
-        if args.prefix:
-            if url.startswith("http"):
-                pass
-            else:
-                url = args.prefix + url
-        string = "<div><a href='%s' target='_blank' class='text'>%s" % (
-            cgi.escape(url),
-            cgi.escape(url)
-        )
-        html += string
 
     if args.output != 'cli':
         html_save(html)
