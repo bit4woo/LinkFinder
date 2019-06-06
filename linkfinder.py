@@ -481,6 +481,8 @@ if __name__ == "__main__":
             if url.startswith("http"):
                 pass
             else:
+                if not url.startswith("/"):
+                    url = "/"+url
                 url = args.prefix + url
         string = "<div><a href='%s' target='_blank' class='text'>%s" % (
             cgi.escape(url),
