@@ -123,12 +123,16 @@ def send_request(url):
     q.add_header('Accept-Encoding', 'gzip')
     q.add_header('Cookie', args.cookies)
     
+    ssl._create_default_https_context = ssl._create_unverified_context
+    response = urlopen(q)
+    '''
     try:
         sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         response = urlopen(q, context=sslcontext)
     except:
         sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
         response = urlopen(q, context=sslcontext)
+    '''
 
     if response.info().get('Content-Encoding') == 'gzip':
         data = GzipFile(fileobj=readBytesCustom(response.read())).read()
