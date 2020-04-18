@@ -252,7 +252,7 @@ def html_save(html):
         text_file.write(s.substitute(content=html).encode('utf8'))
         text_file.close()
 
-        print("URL to access output: file://%s" % os.path.abspath(args.output))
+        #print("URL to access output: file://%s" % os.path.abspath(args.output))
         file = "file:///%s" % os.path.abspath(args.output)
         if sys.platform == 'linux' or sys.platform == 'linux2':
             subprocess.call(["xdg-open", file])
